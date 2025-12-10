@@ -1,6 +1,5 @@
 import { 
   Client, 
-  ChatInputCommandInteraction, 
   ClientEvents
 } from 'discord.js';
 import type { Logger } from 'winston';
@@ -142,7 +141,7 @@ export class CommandHandler {
       if (!command) return;
 
       try {
-        // Run validation functions
+
         if (this._validationFuncs.length) {
           let canRun = true;
 

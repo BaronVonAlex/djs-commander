@@ -37,7 +37,7 @@
     "validations",
     "slash-commands"
   ],
-  "author": "Your Name",
+  "author": "BaronVonAlex",
   "license": "MIT",
   "peerDependencies": {
     "discord.js": "^14.14.0"
