@@ -1,35 +1,57 @@
 {
-  "name": "djs-commander",
-  "version": "0.0.50",
-  "description": "A command and event handler that works seamlessly with Discord.js",
-  "types": "./index.d.ts",
+  "name": "baronvonalex/djs-commander",
+  "version": "1.0.0",
+  "description": "A modern command and event handler for Discord.js v14+",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
     }
   },
+  "files": [
+    "dist",
+    "index.d.ts",
+    "README.md"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --clean",
-    "watch": "yarn build --watch src",
-    "prepublishOnly": "yarn build"
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "watch": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/notunderctrl/djs-commander"
+    "url": "https://github.com/BaronVonAlex/djs-commander"
   },
-  "homepage": "https://djs-commander.underctrl.io",
   "keywords": [
     "discord.js",
+    "discord",
+    "bot",
     "command",
     "handler",
     "events",
-    "validations"
+    "validations",
+    "slash-commands"
   ],
+  "author": "Your Name",
+  "license": "MIT",
+  "peerDependencies": {
+    "discord.js": "^14.14.0"
+  },
   "devDependencies": {
-    "discord.js": "^14.7.1",
-    "tsup": "^6.6.0",
-    "typescript": "^4.9.5",
-    "winston": "^3.8.2"
+    "@types/node": "^20.11.0",
+    "discord.js": "^14.14.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  },
+  "optionalDependencies": {
+    "winston": "^3.11.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
