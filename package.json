@@ -1,5 +1,5 @@
 {
-  "name": "baronvonalex/djs-commander",
+  "name": "@baronvonalex/djs-commander",
   "version": "1.0.0",
   "description": "A modern command and event handler for Discord.js v14+",
   "types": "./dist/index.d.ts",
