@@ -1,12 +1,12 @@
 import { Client, APIApplicationCommand } from 'discord.js';
 import { Logger } from 'winston';
 
-class CommandHandler {
+declare class CommandHandler {
   constructor(options: CommandHandlerOptions);
   public get commands(): LocalCommand[];
 }
 
-interface CommandHandlerOptions {
+declare interface CommandHandlerOptions {
   client: Client;
   commandsPath?: string;
   eventsPath?: string;
@@ -15,7 +15,7 @@ interface CommandHandlerOptions {
   logger?: Logger;
 }
 
-interface LocalCommand extends APIApplicationCommand {
+declare interface LocalCommand extends APIApplicationCommand {
   deleted?: boolean;
   [key: string]: any;
 }

@@ -1,77 +1,27 @@
-import { Client } from 'discord.js';
-import { Logger } from 'winston';
-import { LocalCommand } from '../dev';
-import { getAppCommands } from './getAppCommands';
-import { areCommandsDifferent } from './areCommandsDifferent';
+import type { Client } from 'discord.js';
+import type { Logger } from 'winston';
+import type { LocalCommand } from '../types.js';
+import { getAppCommands } from './getAppCommands.js';
+import { areCommandsDifferent } from './areCommandsDifferent.js';
+
+interface RegisterCommandsOptions {
+  client: Client;
+  commands: LocalCommand[];
+  testServer?: string;
+  logger?: Logger;
+}
 
 export async function registerCommands({
   client,
   commands: localCommands,
   testServer,
   logger,
-}: {
-  client: Client;
-  commands: LocalCommand[];
-  testServer?: string;
-  logger?: Logger;
-}) {
-  const applicationCommands = (await getAppCommands(client, testServer)) as any;
+}: RegisterCommandsOptions): Promise<void> {
+  try {
+    const applicationCommands = await getAppCommands(client, testServer);
 
-  for (const localCommand of localCommands) {
-    const {
-      name,
-      name_localizations,
-      description,
-      description_localizations,
-      default_member_permissions,
-      dm_permission,
-      options,
-    } = localCommand;
-
-    const existingCommand = applicationCommands.cache.find((cmd: any) => cmd.name === name);
-
-    if (existingCommand) {
-      if (localCommand.deleted) {
-        await applicationCommands.delete(existingCommand.id);
-
-        let message = `🗑 Deleted command "${name}".`;
-
-        if (logger) {
-          logger.info(message);
-        } else {
-          console.log(message);
-        }
-
-        continue;
-      }
-
-      if (areCommandsDifferent(existingCommand, localCommand)) {
-        await applicationCommands.edit(existingCommand.id, {
-          description,
-          options,
-        });
-
-        let message = `🔁 Edited command "${name}".`;
-
-        if (logger) {
-          logger.info(message);
-        } else {
-          console.log(message);
-        }
-      }
-    } else {
-      if (localCommand.deleted) {
-        let message = `⏩ Skipping registering command "${name}" as it's set to delete.`;
-        if (logger) {
-          logger.info(message);
-        } else {
-          console.log(message);
-        }
-
-        continue;
-      }
-
-      await applicationCommands.create({
+    for (const localCommand of localCommands) {
+      const {
         name,
         name_localizations,
         description,
@@ -79,15 +29,59 @@ export async function registerCommands({
         default_member_permissions,
         dm_permission,
         options,
-      });
+      } = localCommand;
 
-      let message = `✅ Registered command "${name}".`;
+      const existingCommand = applicationCommands.cache.find(
+        (cmd: any) => cmd.name === name
+      );
 
-      if (logger) {
-        logger.info(message);
+      if (existingCommand) {
+        if (localCommand.deleted) {
+          await applicationCommands.delete(existingCommand.id);
+          log(logger, 'info', `🗑 Deleted command "${name}".`);
+          continue;
+        }
+
+        if (areCommandsDifferent(existingCommand, localCommand)) {
+          await applicationCommands.edit(existingCommand.id, {
+            name,
+            description,
+            options: options || [],
+            name_localizations,
+            description_localizations,
+            default_member_permissions,
+            dm_permission,
+          });
+          log(logger, 'info', `🔁 Edited command "${name}".`);
+        }
       } else {
-        console.log(message);
+        if (localCommand.deleted) {
+          log(logger, 'info', `⏩ Skipping registering command "${name}" as it's set to delete.`);
+          continue;
+        }
+
+        await applicationCommands.create({
+          name,
+          name_localizations,
+          description,
+          description_localizations,
+          default_member_permissions,
+          dm_permission,
+          options: options || [],
+        });
+        log(logger, 'info', `✅ Registered command "${name}".`);
       }
     }
+  } catch (error) {
+    log(logger, 'error', 'Error registering commands:', error);
+    throw error;
+  }
+}
+
+function log(logger: Logger | undefined, level: 'info' | 'error', message: string, ...args: any[]): void {
+  if (logger) {
+    logger[level](message, ...args);
+  } else {
+    console[level === 'info' ? 'log' : 'error'](message, ...args);
   }
 }
